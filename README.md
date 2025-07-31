@@ -36,13 +36,13 @@ cd Todo-List-nodejs
 ```
 
 Updated `.env` with my own database cluster on mongodb
-
+```
 
 #### 2. Dockerize:
 
 `Dockerfile`:
 
-```dockerfile
+```
 FROM node:18
 WORKDIR /app
 COPY package*.json ./
