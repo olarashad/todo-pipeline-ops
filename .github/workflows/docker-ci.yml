@@ -24,7 +24,7 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Push Docker image
-        run: docker push my-todo-app
+        run: docker push olarashad/todo-node-app:latest
         working-directory: ./Todo-List-nodejs
 
       # Optional: SCP or SSH deployment steps here...
