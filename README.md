@@ -17,6 +17,7 @@ This project demonstrates a full DevOps workflow applied on a Node.js Todo List 
 ├── screenshots/                      # Contains all images used in this README
 └── README.md
 
+```
 ## Part 1: Dockerization & CI with GitHub Actions 
 
 ### ✅ Tasks:
@@ -30,7 +31,6 @@ This project demonstrates a full DevOps workflow applied on a Node.js Todo List 
 
 #### 1. Clone and Configure .env:
 
-```
 git clone https://github.com/Ankit6098/Todo-List-nodejs.git
 cd Todo-List-nodejs
 ```
