@@ -1,0 +1,201 @@
+# DevOps Project: Todo List App Deployment
+
+This project demonstrates the full DevOps lifecycle for deploying a Node.js-based Todo List app using Docker, GitHub Actions CI/CD, Ansible, and Docker Compose with auto-update functionality using Watchtower. Azure was used to create and host the virtual machine used in this setup.
+
+---
+
+## 📁 Repo Structure
+
+```bash
+├── .github/workflows/ci.yml          # GitHub Actions pipeline
+├── Dockerfile                        # Dockerize the Node.js app
+├── docker-compose.yml                # Compose file used in the VM
+├── .env                              # Environment variables used by Compose
+├── todo-app-deploy/                  # Folder on the VM containing compose setup
+├── ansible/                          # Ansible playbook and inventory files
+├── src/                              # App source code
+└── README.md                         # This documentation
+```
+
+---
+
+## ✅ Part 1: CI/CD Pipeline & Dockerization (30 points)
+
+### 🔗 Clone the App
+
+Cloned from: [https://github.com/Ankit6098/Todo-List-nodejs](https://github.com/Ankit6098/Todo-List-nodejs)
+
+### 🛠️ Edit `.env`
+
+Configured the `.env` file to use a personal MongoDB instance:
+
+```env
+PORT=4000
+MONGODB_URI=mongodb+srv://<user>:<pass>@cluster.mongodb.net/todos
+```
+
+### 🐳 Dockerization
+
+Created a Dockerfile:
+
+```Dockerfile
+FROM node:18
+WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+EXPOSE 4000
+CMD ["npm", "start"]
+```
+
+### 🔁 GitHub Actions CI
+
+A workflow was created to build the Docker image and push to DockerHub.
+
+`.github/workflows/ci.yml`
+
+```yaml
+name: CI Pipeline
+on: [push]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Login to DockerHub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push
+        run: |
+          docker build -t olarashad/todo-node-app:latest .
+          docker push olarashad/todo-node-app:latest
+```
+
+📸 **CI Workflow Run Success:**
+![ci-run](screenshots/ci-run.png)
+
+---
+
+## 💻 Part 2: VM Creation & Ansible Configuration (30 points)
+
+### ☁️ VM Creation using Azure
+
+A Linux Ubuntu VM was created via the Microsoft Azure portal. Later, a directory named `todo-app-deploy` was created inside the VM to hold deployment files such as `docker-compose.yml` and `.env`. These files are included in the repository for reference and reproducibility.
+
+📸 **Azure VM:**
+![azure-vm](screenshots/azure-vm.png)
+
+### ⚙️ Ansible from Local Machine
+
+* Configured inventory file:
+
+```ini
+azure_vm ansible_host=<vm_public_ip> ansible_user=azureuser ansible_ssh_private_key_file=~/.ssh/azure_key
+```
+
+* Wrote playbook to install Docker:
+
+```yaml
+---
+- hosts: azure_vm
+  become: true
+  tasks:
+    - name: Install Docker
+      apt:
+        name: docker.io
+        state: present
+    - name: Start and Enable Docker
+      systemd:
+        name: docker
+        enabled: yes
+        state: started
+```
+
+📸 **Docker Running on VM:**
+![docker-installed](screenshots/docker-installed.png)
+
+---
+
+## 🧠 Part 3: Deployment via Docker Compose & Auto-Update (40 points)
+
+### 📁 Folder Structure on VM
+
+A folder `todo-app-deploy` was created on the VM containing:
+
+* `docker-compose.yml`
+* `.env`
+
+📸 **Folder Structure on VM:**
+![vm-folder](screenshots/vm-folder.png)
+
+### 🧾 docker-compose.yml
+
+```yaml
+version: "3.8"
+services:
+  todo-app:
+    image: olarashad/todo-node-app:latest
+    ports:
+      - "4000:4000"
+    env_file:
+      - .env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  watchtower:
+    image: containrrr/watchtower
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 30
+```
+
+### 🔁 Auto-Update Using Watchtower
+
+Watchtower monitors changes to the `todo-node-app` image.
+
+📸 **Watchtower Auto-Update Log:**
+![watchtower-log](screenshots/watchtower-log.png)
+
+### ✅ Health Checks
+
+Health check configured in `docker-compose.yml` for endpoint availability.
+
+📸 **Health Check in Docker:**
+![health-check](screenshots/health-check.png)
+
+---
+
+## 📌 Conclusion
+
+* CI/CD automated using GitHub Actions.
+* Dockerized Node.js app built and pushed to DockerHub.
+* Ansible installed Docker on Azure VM from local machine.
+* Docker Compose used for running the app with health checks.
+* Watchtower enabled automatic updates from DockerHub.
+
+---
+
+## 🧠 Notes
+
+* Ensure DockerHub credentials are stored in GitHub secrets.
+* VM firewall allows port 4000 for access.
+* All production config files (`docker-compose.yml`, `.env`) are included in the repo.
+
+---
+
+## 📸 Screenshots Directory
+
+* `screenshots/` folder in the repo contains all images used in this README.
+
+---
+
+Feel free to reach out if you want to contribute or raise an issue!
+
+> Made with ☕️ by Ola Rashad 💙
