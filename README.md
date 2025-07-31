@@ -166,8 +166,8 @@ ansible-playbook -i inventory.ini install-docker.yml
 ```
 
 
-![Ansible Output](screenshots/ansible1.png)
-(screenshots/ansible.png)
+![Ansible Output1](screenshots/ansible1.png)
+![Ansible output](screenshots/ansible.png)
 
 ---
 
