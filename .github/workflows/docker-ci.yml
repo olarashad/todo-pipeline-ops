@@ -1,33 +1,30 @@
-# .github/workflows/docker-ci.yml
-
-name: Build and Push Docker Image
+name: Deploy Todo App
 
 on:
   push:
     branches:
       - main
-    #   - master
 
 jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
+      - name: Checkout repo
+        uses: actions/checkout@v3
 
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v1
+      - name: Set up Docker
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: docker build -t my-todo-app .
+        working-directory: ./Todo-List-nodejs
 
       - name: Login to DockerHub
-        uses: docker/login-action@v1
-        with:
-          username: ${{ secrets.DOCKER_USERNAME }}
-          password: ${{ secrets.DOCKER_PASSWORD }}
+        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: ./Todo-List-nodejs       
-          push: true
-          tags: your-docker-username/todo-node-app:latest
+      - name: Push Docker image
+        run: docker push my-todo-app
+        working-directory: ./Todo-List-nodejs
+
+      # Optional: SCP or SSH deployment steps here...
