@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: List files
+        run: ls -R
+
       - name: Checkout repo
         uses: actions/checkout@v3
 
@@ -17,7 +20,7 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        run: docker build -t your-docker-username/todo-node-app:latest ./Todo-List-nodejs
+        run: docker build -t your-docker-username/todo-node-app:latest ./todo-deployment-project/Todo-List-nodejs
         working-directory: ./Todo-List-nodejs
 
       - name: Login to DockerHub
