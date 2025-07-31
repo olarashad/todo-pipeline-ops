@@ -23,14 +23,14 @@ jobs:
         uses: docker/setup-buildx-action@v3
 
       - name: Build Docker image
-        run: docker build -t olarashad/todo-node-app:latest ./todo-deployment-project/Todo-List-nodejs
+        run: docker build -t olarashad/todo-node-app:latest .
         working-directory: ./Todo-List-nodejs
 
       - name: Login to DockerHub
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
+
       - name: Push Docker image
         run: docker push olarashad/todo-node-app:latest
-        working-directory: ./Todo-List-nodejs
 
       # Optional: SCP or SSH deployment steps here...
