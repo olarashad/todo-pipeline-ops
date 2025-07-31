@@ -10,8 +10,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: List files
-        run: ls -R
+      - name: List files root
+        run: ls -la
+
+      - name: List files recursive
+        run: ls -lR
 
       - name: Checkout repo
         uses: actions/checkout@v3
